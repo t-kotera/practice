@@ -1,6 +1,3 @@
-print("hello world")
-
-print("xcvbn")
 
 print("asdfg")
 a=12345
