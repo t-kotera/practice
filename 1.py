@@ -1,28 +1,35 @@
+def is_prime(n: int) -> bool:
+    """n が素数かどうかを判定する"""
+    if n < 2:
+        return False
+    if n == 2:
+        return True
+    if n % 2 == 0:
+        return False
+    d = 3
+    while d * d <= n:
+        if n % d == 0:
+            return False
+        d += 2
+    return True
 
 
-a=12345
-c=12345
-print(a+c)
+def primes_up_to(limit: int) -> list[int]:
+    """2 以上 limit 以下の素数を返す"""
+    return [n for n in range(2, limit + 1) if is_prime(n)]
 
 
-def free(a,b):
-    a=a*123
-    b=b/2
-    return a,b
+if __name__ == "__main__":
+    try:
+        limit = int(input("上限を入力してください (例: 100): "))
+    except ValueError:
+        print("整数を入力してください。")
+        raise SystemExit(1)
 
-x=100
-z=100
-free(x,z)
-print(x,z)
+    if limit < 2:
+        print("2 以上の整数を入力してください。")
+        raise SystemExit(1)
 
-
-x=(1,2,3,4,5)
-s=0
-for i in x:
-    s=i*i
-    print(s)
-
-
-
-z=x[2]
-pritn(z)
+    result = primes_up_to(limit)
+    print(f"2 から {limit} までの素数 ({len(result)} 個):")
+    print(result)
