@@ -21,3 +21,8 @@ s=0
 for i in x:
     s=i*i
     print(s)
+
+
+
+z=x[2]
+pritn(z)
