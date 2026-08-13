@@ -1,2 +1,338 @@
-<h1>Hello Git</h1>
-<button>送信</button>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prime Finder — 素数ファインダー</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --surface: #121a2f;
+      --surface-2: #1a2440;
+      --border: #2a3658;
+      --text: #e8edf8;
+      --muted: #93a0bf;
+      --accent: #6ee7ff;
+      --accent-2: #a78bfa;
+      --prime: #34d399;
+      --danger: #fb7185;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 0%, rgba(110, 231, 255, 0.12), transparent 35%),
+        radial-gradient(circle at 80% 10%, rgba(167, 139, 250, 0.12), transparent 30%),
+        var(--bg);
+    }
+
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 48px 20px 64px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--accent);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 5vw, 3rem);
+      line-height: 1.1;
+    }
+
+    .lead {
+      margin: 0 auto;
+      max-width: 560px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .card {
+      background: rgba(18, 26, 47, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    }
+
+    .controls {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 1.1rem;
+    }
+
+    input[type="number"]:focus {
+      outline: 2px solid rgba(110, 231, 255, 0.35);
+      border-color: var(--accent);
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 14px 22px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      color: #061018;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      white-space: nowrap;
+    }
+
+    button:hover { filter: brightness(1.05); }
+    button:active { transform: translateY(1px); }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .stat {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .stat .num {
+      display: block;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .stat .label {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 4px;
+    }
+
+    .result-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 28px 0 12px;
+    }
+
+    .result-head h2 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .result-head span {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .primes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      min-height: 80px;
+    }
+
+    .prime-chip {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(52, 211, 153, 0.12);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      color: var(--prime);
+      font-weight: 700;
+      animation: pop 0.25s ease;
+    }
+
+    @keyframes pop {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .empty {
+      color: var(--muted);
+      padding: 12px 0;
+    }
+
+    .error {
+      margin-top: 14px;
+      color: var(--danger);
+      min-height: 1.2em;
+    }
+
+    footer {
+      margin-top: 28px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 640px) {
+      .controls { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="badge">Number Lab</div>
+      <h1>素数ファインダー</h1>
+      <p class="lead">
+        2 から指定した上限まで、素数を一覧表示します。
+        Python の <code>1.py</code> と同じ考え方を、ブラウザ上で試せます。
+      </p>
+    </header>
+
+    <main class="card">
+      <div class="controls">
+        <div>
+          <label for="limit">上限を入力</label>
+          <input id="limit" type="number" min="2" value="100" placeholder="例: 100" />
+        </div>
+        <button id="run">素数を探す</button>
+      </div>
+
+      <p class="error" id="error"></p>
+
+      <div class="stats">
+        <div class="stat">
+          <span class="num" id="statCount">0</span>
+          <span class="label">素数の個数</span>
+        </div>
+        <div class="stat">
+          <span class="num" id="statMax">—</span>
+          <span class="label">最大の素数</span>
+        </div>
+        <div class="stat">
+          <span class="num" id="statLimit">100</span>
+          <span class="label">上限</span>
+        </div>
+      </div>
+
+      <div class="result-head">
+        <h2>結果</h2>
+        <span id="rangeText">2 〜 100</span>
+      </div>
+      <div class="primes" id="primes">
+        <p class="empty">「素数を探す」を押してください。</p>
+      </div>
+    </main>
+
+    <footer>practice project · HTML + JavaScript</footer>
+  </div>
+
+  <script>
+    function isPrime(n) {
+      if (n < 2) return false;
+      if (n === 2) return true;
+      if (n % 2 === 0) return false;
+      for (let d = 3; d * d <= n; d += 2) {
+        if (n % d === 0) return false;
+      }
+      return true;
+    }
+
+    function primesUpTo(limit) {
+      const result = [];
+      for (let n = 2; n <= limit; n += 1) {
+        if (isPrime(n)) result.push(n);
+      }
+      return result;
+    }
+
+    const limitInput = document.getElementById("limit");
+    const runBtn = document.getElementById("run");
+    const errorEl = document.getElementById("error");
+    const primesEl = document.getElementById("primes");
+    const statCount = document.getElementById("statCount");
+    const statMax = document.getElementById("statMax");
+    const statLimit = document.getElementById("statLimit");
+    const rangeText = document.getElementById("rangeText");
+
+    function render() {
+      errorEl.textContent = "";
+      const raw = limitInput.value.trim();
+      const limit = Number(raw);
+
+      if (!raw || Number.isNaN(limit)) {
+        errorEl.textContent = "整数を入力してください。";
+        return;
+      }
+      if (limit < 2) {
+        errorEl.textContent = "2 以上の整数を入力してください。";
+        return;
+      }
+      if (limit > 10000) {
+        errorEl.textContent = "上限は 10000 以下にしてください。";
+        return;
+      }
+
+      const primes = primesUpTo(limit);
+      statCount.textContent = primes.length;
+      statMax.textContent = primes.length ? primes[primes.length - 1] : "—";
+      statLimit.textContent = limit;
+      rangeText.textContent = `2 〜 ${limit}`;
+
+      primesEl.innerHTML = "";
+      if (primes.length === 0) {
+        primesEl.innerHTML = '<p class="empty">素数は見つかりませんでした。</p>';
+        return;
+      }
+
+      for (const p of primes) {
+        const chip = document.createElement("span");
+        chip.className = "prime-chip";
+        chip.textContent = p;
+        primesEl.appendChild(chip);
+      }
+    }
+
+    runBtn.addEventListener("click", render);
+    limitInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
